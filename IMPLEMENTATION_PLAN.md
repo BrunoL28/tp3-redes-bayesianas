@@ -1,6 +1,8 @@
 # IMPLEMENTATION PLAN — tp3-redes-bayesianas
 
-**Revision:** 1 · **Date:** 2026-11-14 · **Previous revisions:** `archive/` (none yet)
+**Revision:** 2 · **Date:** 2026-11-14 · **Previous revisions:** `archive/IMPLEMENTATION_PLAN_rev1_2026-11-14.md`
+
+> **Rev 2 (2026-11-14), decidida pelo Bruno:** (1) `qtd_atingida` fundida em `um`/`dois_ou_mais` e 65 linhas sem quantidade removidas no notebook (base 72.812); (2) novo **HC + BIC por camadas** (`ExpertKnowledge(temporal_order=CAMADAS)`) como 4ª estrutura na Tarefa 3 e rede das Tarefas 4–5 — o HC livre continua na comparação; (3) **variante** com `required_edges=[(ingestao_motor, efeito_voo)]` só como comparação da Q2/Q3; (4) **Q4** passa a ser `do(tamanho_animal = pequeno)`; (5) **2º caso na Tarefa 5** (falso negativo); (6) desempate determinístico no HC. As seções §9 C6–C10 abaixo ainda descrevem o desenho da rev 1; **o notebook é a fonte da verdade** para o código.
 
 > Pequenas mudanças (componente concluído, bug corrigido) → editar no lugar. Mudanças grandes (troca do segundo método, nova base, reestruturação) → mover para `archive/IMPLEMENTATION_PLAN_rev1_AAAA-MM-DD.md` e escrever a rev 2.
 >
@@ -10,24 +12,24 @@
 
 ## 1. Current Implementation Status
 
-**Phase:** Phase 1 — build. Notebook completo (Tarefas 1–5) executado e validado localmente; faltam o teste limpo (T12, com download real e pandas 2), o relatório LaTeX (C12) e a entrega (C13).
+**Phase:** Phase 1 — build. Notebook rev 2 executado e validado localmente (2 execuções idênticas com `PYTHONHASHSEED` diferentes); relatório LaTeX escrito (4 páginas, ABNT). Faltam: nova execução no Colab da versão rev 2, matrícula da Eduarda e a entrega (C13).
 
 | # | Component | Status | Tested? | Notes |
 |---|---|---|---|---|
 | C0 | Ambiente local (`.venv` + pgmpy 1.1.2) | ✅ Done | Smoke test de todas as chamadas da §7.2 (2026-11-14) | pandas 3.1.1, numpy 2.5.4, networkx 3.7 |
 | C1 | Notebook — setup do ambiente | ✅ Done | Execução completa local | `notebook/tp3_redes_bayesianas.ipynb` (52 células, salvo com saídas) |
 | C2 | Notebook — coleta e tratamento | ✅ Done | Script via `%%writefile` + `subprocess` com o Python do kernel; saída idêntica ao script de `INPUTS/` | Leitura do xlsx: pico 4,5 GB (pandas 3) / 5,3 GB (pandas 2) no subprocesso |
-| C3 | Carga e validação da base | ✅ Done | 72.877 × 14, 0 NaN, estados conferidos, crosstab dano × nível ok | |
+| C3 | Carga e validação da base | ✅ Done | Script: 72.877; após fundir `qtd_atingida` e remover 65 linhas: 72.812 × 14, 0 NaN, estados conferidos, crosstab dano × nível ok | `preparar()` no notebook; `INPUTS/` intocado |
 | C4 | Tarefa 1 | ✅ Done | Tabelas de variáveis, tercis (asserção bate com o CSV), funil, figura de taxa de dano | Tercis de altura: (1, 350], (350, 1700], (1700, 32000] pés |
 | C5 | Tarefa 2 | ✅ Done | 17 arestas, acíclico; figura no layout do desenho original | |
-| C6 | Tarefa 3a — HC + BIC | ✅ Done | 29 arestas, 1.182 parâmetros, BIC −701.077; determinístico em 6 `PYTHONHASHSEED` | `tabu_length=0`; com 100 o grafo é idêntico |
-| C7 | Tarefa 3b — Chow-Liu | ✅ Done | 13 arestas; BIC idêntico nas 14 raízes; raiz `massa_aeronave` | Calculado uma vez (10 s) e reorientado por `nx.bfs_tree`, igual ao pgmpy |
-| C8 | Tarefa 3c — comparação | ✅ Done | Tabelas de arestas, SHD entre CPDAGs (função própria), coocorrência de `desconhecido` | Árvore de Chow-Liu ⊂ esqueleto do HC (verificado) |
-| C9 | Tarefa 4 | ✅ Done | BDeu α = 50 escolhido em holdout; Q1–Q4 com checagem empírica; Q4 confere com `CausalInference` | Q2/Q3 divergem dos dados — explicado (aresta `ingestao_motor → efeito_voo` descartada pelo BIC: ΔLL +154, ΔBIC −920) |
-| C10 | Tarefa 5 | ✅ Done | Caso FAA 1515245: 90,9%; P(blanket) = P(evidência completa) até 1e-9 | Intervenções por cirurgia do grafo (`modelo.do`) |
-| C11 | Figuras e tabelas | ✅ Done | 8 figuras (PDF+PNG) em `relatorio/figuras/`, 18 tabelas `.tex` (pt-BR) + explicação em `relatorio/tabelas/` | |
-| C12 | Relatório LaTeX | ⬜ Not started | — | Vancouver via natbib/`unsrtnat` (padrão; CONTEXT §9 #5) |
-| C13 | Entrega | ⬜ Not started | — | Depende de T12 e C12 |
+| C6 | Tarefa 3a — HC + BIC (livre e por camadas) | ✅ Done | Livre: 31 arestas, 1.302 parâmetros, BIC −696.115,1. Por camadas: 31 arestas, 1.345 parâmetros, BIC −697.125,0 (custo da ordem 1.009,9). Ambos idênticos em 6 `PYTHONHASHSEED` com o desempate ordenado | `tabu_length=0`; subclasse `HillClimbing` (bug log) |
+| C7 | Tarefa 3b — Chow-Liu | ✅ Done | 13 arestas; BIC −709.953,5, idêntico nas 14 raízes; raiz `massa_aeronave` | Calculado uma vez (8–10 s) e reorientado por `nx.bfs_tree`, igual ao pgmpy |
+| C8 | Tarefa 3c — comparação | ✅ Done | 4 estruturas; SHD vs elicitada: livre 28, camadas 25, Chow-Liu 21; figura 2×2 | Árvore de Chow-Liu ⊂ esqueleto dos dois HCs (verificado) |
+| C9 | Tarefa 4 | ✅ Done | Rede por camadas; BDeu α = 50 (MLE: P = 0 em 15 registros de teste); Q1–Q4 com checagem empírica; Q4 = `do(tamanho_animal)` confere com `CausalInference` (3,04% obs × 3,06% do) | Variante com a aresta forçada: Q2 14,4% (dados 15,1%) mas Q3 7,5% (dados 38,2%), BIC e LL de teste piores → mantida a rede sem a aresta |
+| C10 | Tarefa 5 | ✅ Done | Caso 1 FAA 1577229: 91,8% (= linha da CPT); P(blanket) = P(evidência completa) até 1e-9. Caso 2 (falso negativo) FAA 971157: 1,9%, igual à taxa das 31.284 colisões com o mesmo perfil | Intervenções por cirurgia do grafo (`modelo.do`) |
+| C11 | Figuras e tabelas | ✅ Done | 9 figuras (PDF+PNG) em `relatorio/figuras/`, 21 tabelas `.tex` (pt-BR) + explicação em `relatorio/tabelas/` | `fig_comparacao` e `fig_tornado` redimensionadas para leitura no PDF |
+| C12 | Relatório LaTeX | ✅ Done | `latexmk -pdf main.tex`: 4 páginas, sem `??`, sem overfull; figuras 1–2 e tabelas 1–3 citadas no texto; `ai_tells.py`: 0 clichês, CV 0,63 | 2 colunas, 10 pt; ABNT; tabelas compactas escritas à mão a partir das saídas do notebook |
+| C13 | Entrega | ⬜ Not started | — | Depende da execução da rev 2 no Colab e da matrícula da Eduarda |
 
 ### Bug log
 
@@ -38,6 +40,7 @@
 | 2026-11-14 | `SHD()` com PDAG: `ValueError` (só aceita DAG) | Limitação do pgmpy 1.1.2 | `shd_cpdag` própria no notebook | Fixed |
 | 2026-11-14 | Estados das CPTs em ordem alfabética | O estimador ignora a ordem das categorias | `state_names=STATE_NAMES` no estimador | Fixed |
 | 2026-11-14 | `CausalInference.query(do=ingestao_motor)` → `ValueError` (alvo é ancestral da variável intervinda) | Comportamento correto do pgmpy | Intervenção por cirurgia: `modelo.do([X])` + `VariableElimination` | Fixed |
+| 2026-11-14 | HC livre deu redes diferentes em execuções seguidas (32 arestas/BIC −695.978 × 31/−695.441) depois da fusão de `qtd_atingida` | `_legal_operations_dag` itera `set(permutations(...))`; a ordem depende do hash aleatório de strings, e `max()` fica com a primeira operação entre empates de BIC (arestas reversíveis) | Subclasse `HillClimbing` ordena as operações antes do `max()`; 6 `PYTHONHASHSEED` → mesmo grafo nas 3 buscas | Fixed |
 | 2026-11-14 | WSL derrubado por falta de memória (12 GB) | Duas execuções do notebook em paralelo: leitura do xlsx (5,3 GB, pandas 2) + kernel com 4,9 GB (`TreeSearch` `n_jobs=-1` ×14 = +1,7 GB; parquet inteiro = +0,7 GB) | `TreeSearch(n_jobs=1)` uma vez só; parquet só com 4 colunas; kernel agora ≤ 0,44 GB; execuções pesadas uma por vez e com `systemd-run -p MemoryMax` | Fixed |
 
 ---
@@ -541,11 +544,12 @@ Só se o relatório for escrito/compilado no Overleaf. Ler `.agents/skills/overl
 | 8 | Viés de seleção: removidas 65.745 linhas sem dano informado e 20.623 sem fase | Open | Discutir em Limitações; mostrar taxa de dano por ano estável (0,4–0,8% grave) |
 | 9 | `nivel_dano` determinístico em relação a `houve_dano` | Low risk | Fora do aprendizado; C3 confirma por crosstab |
 | 10 | Assinaturas pgmpy 1.1.2 | Resolved | Smoke test feito; desvios no bug log |
-| 14 | Q2 e Q3: a rede diverge dos dados (sem aresta `ingestao_motor → efeito_voo`) | Accepted | É resultado: discutido na Tarefa 4 com o cálculo do BIC da aresta |
-| 15 | Teste limpo T12 (venv novo, pandas 2, download real) ainda não concluído — a primeira tentativa morreu com o WSL | Open | Rodar sozinho, com `systemd-run -p MemoryMax=9G` |
+| 14 | Q2 e Q3: a rede diverge dos dados (sem aresta `ingestao_motor → efeito_voo`) | Accepted | É resultado: na rede por camadas a aresta custa ΔBIC −919 (ΔLL +155,7, 192 parâmetros); a variante forçada conserta a Q2 e estraga a Q3 — discutido no notebook e no relatório |
+| 16 | Q1: rede subestima o dano com animal grande (39,2% × 44,0%) — liga massa e tamanho só indiretamente (P(leve \| grande) 15,9% × 31,6%) | Accepted | Igual no HC livre (39,2%); discutido |
+| 15 | Teste limpo T12 | Partial | Bruno rodou a versão rev 1 no Colab (download real, pandas 2): terminou e gerou tudo, pico ≈ 8 GB de RAM. A rev 2 só rodou localmente (cache parquet); rodar de novo no Colab antes de congelar |
 | 11 | Repo privado: notebook não pode buscar nada do GitHub | Low risk | Script embutido via `%%writefile` (C2) |
 | 12 | Leitura causal das intervenções (`do()`) depende de assumir o DAG aprendido como causal | Open | Ressalva explícita em C9/C10 e no relatório |
-| 13 | TP individual ou em grupo; formato de citação; Overleaf ou local | Open | Bruno (CONTEXT §9 #2, #5) |
+| 13 | TP em grupo (3 integrantes); citação ABNT | Resolved | Falta só a matrícula da Eduarda Amaral |
 
 ---
 
@@ -572,17 +576,17 @@ Só se o relatório for escrito/compilado no Overleaf. Ler `.agents/skills/overl
 |---|---|---|---|
 | T1 Versões | célula C1 | `pgmpy 1.1.2` impresso; assert passa | ✅ |
 | T2 Coleta | `!python coletar_birdstrikes.py` | `strikes_rede.csv` com 17 colunas, sem padding; `relatorio.md` gerado | ✅ |
-| T3 Carga | `carregar_base` | 72.877 linhas (ou diferença registrada), 0 NaN, nenhum estado fora de `STATE_NAMES` | ✅ |
+| T3 Carga | `carregar_base` + `preparar` | 72.877 do script → 72.812 (ou diferença registrada), 0 NaN, nenhum estado fora de `STATE_NAMES` | ✅ |
 | T4 Determinismo do alvo | `crosstab(houve_dano, nivel_dano)` | só diagonais nao/nenhum e sim/{leve, grave} | ✅ |
 | T5 Elicitada | `dag_elic` | 14 nós, 17 arestas, acíclico | ✅ |
-| T6 HC | `dag_hc` | DAG (não PDAG), acíclico, 14 nós; BIC ≥ BIC(elicitada) | ✅ (BIC −701.077 > −739.940) |
+| T6 HC | `dag_hc`, `dag_cam` | DAG (não PDAG), acíclico, 14 nós; BIC ≥ BIC(elicitada); `dag_cam` respeita as camadas | ✅ (livre −696.115, camadas −697.125 > −736.569; assert das camadas) |
 | T7 Chow-Liu | `dag_cl` | árvore: 13 arestas, cada nó ≤ 1 pai, conexo | ✅ |
 | T8 Modelo | `modelo.check_model()` | True; todas as CPDs somam 1 por coluna | ✅ |
 | T9 Consultas | Q1–Q4 | cada fator soma 1; com suporte ≥ 500 linhas, |rede − empírico| < 2 p.p. (senão, explicar) | ✅ Q1 ok; Q2/Q3 divergem com suporte grande — explicado (Known Holes #14) |
 | T10 Markov blanket | caso da Tarefa 5 | P(alvo | evidência completa) = P(alvo | só blanket) ± 1e-9 | ✅ (igual a 1e-10) |
-| T11 Reprodutibilidade | duas execuções completas | mesmas estruturas, mesmos números | ✅ (2 execuções idênticas; HC igual em 6 sementes de hash) |
-| T12 Execução limpa | venv novo / Colab, *Run all* | termina sem erro; tempo registrado | ⬜ (1ª tentativa perdida na queda do WSL) |
-| T13 Relatório | `latexmk -pdf main.tex` | compila sem `??` (refs quebradas); toda figura/tabela citada | ⬜ |
+| T11 Reprodutibilidade | duas execuções completas | mesmas estruturas, mesmos números | ✅ rev 2: 2 execuções com `PYTHONHASHSEED` 1 e 2 → todas as tabelas idênticas; 3 buscas HC iguais em 6 sementes |
+| T12 Execução limpa | venv novo / Colab, *Run all* | termina sem erro; tempo registrado | 🟡 rev 1 ✅ no Colab (Bruno, pico ≈ 8 GB); rev 2 pendente no Colab |
+| T13 Relatório | `latexmk -pdf main.tex` | compila sem `??` (refs quebradas); toda figura/tabela citada | ✅ 4 páginas, 0 overfull, Figuras 1–2 e Tabelas 1–3 citadas |
 
 ### B. AI test prompts
 

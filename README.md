@@ -1,6 +1,6 @@
 # tp3-redes-bayesianas
 
-> **TL;DR** — TP3 de *Fundamentos de Inteligência Artificial* (DEE): construir, aprender (Hill-Climbing/BIC + um segundo método), parametrizar, consultar e explicar uma **rede bayesiana** sobre a base de colisões de fauna com aeronaves da FAA (2017–2025, 72.877 colisões, 14 nós). Entregáveis: **notebook reproduzível** (instala dependências, baixa a base, roda o tratamento e todas as tarefas) + **relatório em LaTeX**. Fase atual: **Phase 0 — bootstrap concluído, aguardando revisão do plano**.
+> **TL;DR** — TP3 de *Fundamentos de Inteligência Artificial* (DEE): construir, aprender (Hill-Climbing/BIC + um segundo método), parametrizar, consultar e explicar uma **rede bayesiana** sobre a base de colisões de fauna com aeronaves da FAA (2017–2025, 72.812 colisões, 14 nós). Entregáveis: **notebook reproduzível** (instala dependências, baixa a base, roda o tratamento e todas as tarefas) + **relatório em LaTeX**. Fase atual: **Phase 1 — notebook (rev 2) e relatório prontos para revisão do grupo; falta a entrega (`entregas/`)**.
 
 This is a **self-managed project**: all working state lives in versioned markdown in this repo. Agents and humans resume from the docs below — no handoff call needed. Protocol: [`.agents-skills/.agents/skills/self-managed-project/SKILL.md`](.agents-skills/.agents/skills/self-managed-project/SKILL.md).
 
@@ -22,7 +22,7 @@ Read in this order:
 | Dados | pandas, pyarrow, python-calamine, requests | Leitura do `Public.xlsx` (FAA) via calamine (~1–2 min) |
 | Grafos / figuras | networkx, matplotlib (graphviz opcional) | Figuras exportadas para `relatorio/figuras/` |
 | Notebook | Jupyter (`.ipynb`), executável no Colab ou local | Deve ser **autossuficiente**: `pip install`, download da base, tratamento, tarefas 1–5 |
-| Relatório | LaTeX (Overleaf ou local) | ABNT/APA/Vancouver — um só formato nas referências |
+| Relatório | LaTeX local (`relatorio/main.tex`, `latexmk -pdf`) | 2 colunas, até 4 páginas; referências em ABNT |
 
 ## Quick links
 

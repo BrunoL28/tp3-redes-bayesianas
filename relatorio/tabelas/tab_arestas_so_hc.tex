@@ -2,23 +2,24 @@
 \toprule
 Aresta & No CPDAG & IM (nats) \\
 \midrule
-altura → estacao & → & 0,0323 \\
-altura → periodo & → & 0,0786 \\
-avisado → altura & → & 0,0446 \\
-avisado → massa\_aeronave & → & 0,0120 \\
-avisado → tamanho\_animal & — & 0,0612 \\
-ceu → altura & → & 0,0726 \\
-ceu → fase\_voo & → & 0,0184 \\
-ceu → massa\_aeronave & → & 0,0037 \\
-ceu → periodo & → & 0,0337 \\
-ceu → tamanho\_animal & — & 0,0700 \\
-fase\_voo → efeito\_voo & → & 0,0643 \\
-houve\_dano → motor & → & 0,0145 \\
-massa\_aeronave → efeito\_voo & → & 0,0427 \\
+altura → avisado & → & 0,0446 \\
+altura → ceu & — & 0,0727 \\
+altura → estacao & — & 0,0323 \\
+altura → houve\_dano & → & 0,0061 \\
+altura → periodo & — & 0,0787 \\
+altura → tamanho\_animal & → & 0,0435 \\
+avisado → tamanho\_animal & → & 0,0613 \\
+ceu → tamanho\_animal & → & 0,0700 \\
+fase\_voo → efeito\_voo & → & 0,0637 \\
+fase\_voo → periodo & — & 0,0535 \\
+massa\_aeronave → avisado & → & 0,0120 \\
+massa\_aeronave → efeito\_voo & → & 0,0422 \\
 massa\_aeronave → ingestao\_motor & → & 0,0025 \\
-motor → fase\_voo & → & 0,1026 \\
-periodo → estacao & → & 0,0300 \\
-periodo → qtd\_atingida & → & 0,0052 \\
-tamanho\_animal → qtd\_atingida & → & 0,0120 \\
+motor → altura & — & 0,0274 \\
+motor → fase\_voo & — & 0,1027 \\
+periodo → ceu & — & 0,0336 \\
+periodo → estacao & — & 0,0300 \\
+periodo → qtd\_atingida & → & 0,0047 \\
+tamanho\_animal → qtd\_atingida & → & 0,0104 \\
 \bottomrule
 \end{tabular}

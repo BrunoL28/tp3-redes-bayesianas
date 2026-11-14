@@ -1,23 +1,23 @@
-\begin{tabular}{llll}
+\begin{tabular}{lllll}
 \toprule
-Aresta elicitada & Hill-Climbing & Chow-Liu & IM (nats) \\
+Aresta elicitada & HC livre & HC por camadas & Chow-Liu & IM (nats) \\
 \midrule
-estacao → ceu & ausente & ausente & 0,0051 \\
-ceu → avisado & invertida (reversível) & igual & 0,1115 \\
-estacao → animal & ausente & ausente & 0,0012 \\
-periodo → animal & invertida (compelida) & ausente & 0,0122 \\
-fase\_voo → altura & igual & igual & 0,6287 \\
-altura → animal & igual & ausente & 0,0113 \\
-animal → tamanho\_animal & invertida (compelida) & invertida (reversível) & 0,0416 \\
-animal → qtd\_atingida & ausente & ausente & 0,0021 \\
-tamanho\_animal → houve\_dano & igual & igual & 0,0502 \\
-qtd\_atingida → houve\_dano & ausente & ausente & 0,0018 \\
-qtd\_atingida → ingestao\_motor & igual & ausente & 0,0039 \\
-massa\_aeronave → motor & igual & igual & 0,3737 \\
-motor → ingestao\_motor & ausente & ausente & 0,0027 \\
-massa\_aeronave → houve\_dano & invertida (compelida) & ausente & 0,0162 \\
-ingestao\_motor → houve\_dano & invertida (compelida) & invertida (reversível) & 0,0045 \\
-ingestao\_motor → efeito\_voo & ausente & ausente & 0,0016 \\
-houve\_dano → efeito\_voo & igual & ausente & 0,0230 \\
+estacao → ceu & ausente & invertida (reversível) & ausente & 0,0051 \\
+ceu → avisado & igual & igual & igual & 0,1114 \\
+estacao → animal & ausente & ausente & ausente & 0,0012 \\
+periodo → animal & igual & igual & ausente & 0,0122 \\
+fase\_voo → altura & invertida (reversível) & invertida (reversível) & igual & 0,6286 \\
+altura → animal & igual & igual & ausente & 0,0112 \\
+animal → tamanho\_animal & invertida (compelida) & invertida (compelida) & invertida (reversível) & 0,0406 \\
+animal → qtd\_atingida & ausente & ausente & ausente & 0,0009 \\
+tamanho\_animal → houve\_dano & igual & igual & igual & 0,0501 \\
+qtd\_atingida → houve\_dano & invertida (compelida) & ausente & ausente & 0,0014 \\
+qtd\_atingida → ingestao\_motor & igual & igual & ausente & 0,0033 \\
+massa\_aeronave → motor & igual & igual & igual & 0,3728 \\
+motor → ingestao\_motor & ausente & ausente & ausente & 0,0027 \\
+massa\_aeronave → houve\_dano & igual & igual & ausente & 0,0159 \\
+ingestao\_motor → houve\_dano & invertida (compelida) & igual & invertida (reversível) & 0,0045 \\
+ingestao\_motor → efeito\_voo & ausente & ausente & ausente & 0,0017 \\
+houve\_dano → efeito\_voo & igual & igual & ausente & 0,0228 \\
 \bottomrule
 \end{tabular}

@@ -2,17 +2,17 @@
 \toprule
 Evidência & d-conectada (sem evidência) & d-conectada (dado o resto) & Caminho mais curto \\
 \midrule
-estacao & sim & não & estacao ← periodo; periodo → qtd\_atingida; qtd\_atingida → ingestao\_motor; ingestao\_motor ← houve\_dano \\
-periodo & sim & não & periodo → qtd\_atingida; qtd\_atingida → ingestao\_motor; ingestao\_motor ← houve\_dano \\
+estacao & sim & não & estacao → altura; altura → tamanho\_animal; tamanho\_animal → houve\_dano \\
+periodo & sim & não & periodo → altura; altura → tamanho\_animal; tamanho\_animal → houve\_dano \\
 fase\_voo & sim & não & fase\_voo → efeito\_voo; efeito\_voo ← houve\_dano \\
-altura & sim & não & altura ← ceu; ceu → tamanho\_animal; tamanho\_animal → houve\_dano \\
-ceu & sim & sim & ceu → tamanho\_animal; tamanho\_animal → houve\_dano \\
-massa\_aeronave & sim & sim & massa\_aeronave ← houve\_dano \\
-motor & sim & sim & motor ← houve\_dano \\
+altura & sim & não & altura → tamanho\_animal; tamanho\_animal → houve\_dano \\
+ceu & sim & não & ceu → tamanho\_animal; tamanho\_animal → houve\_dano \\
+massa\_aeronave & sim & sim & massa\_aeronave → houve\_dano \\
+motor & sim & não & motor ← massa\_aeronave; massa\_aeronave → houve\_dano \\
 animal & sim & não & animal ← tamanho\_animal; tamanho\_animal → houve\_dano \\
 tamanho\_animal & sim & sim & tamanho\_animal → houve\_dano \\
-qtd\_atingida & sim & sim & qtd\_atingida ← tamanho\_animal; tamanho\_animal → houve\_dano \\
-avisado & sim & sim & avisado → tamanho\_animal; tamanho\_animal → houve\_dano \\
-ingestao\_motor & sim & sim & ingestao\_motor ← houve\_dano \\
+qtd\_atingida & sim & não & qtd\_atingida ← tamanho\_animal; tamanho\_animal → houve\_dano \\
+avisado & sim & não & avisado → tamanho\_animal; tamanho\_animal → houve\_dano \\
+ingestao\_motor & sim & sim & ingestao\_motor → houve\_dano \\
 \bottomrule
 \end{tabular}

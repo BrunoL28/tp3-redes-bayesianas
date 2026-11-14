@@ -6,7 +6,7 @@ _Last updated: 2026-11-14_
 
 ## 1. One-paragraph summary
 
-Trabalho prático 3 da disciplina **Fundamentos de Inteligência Artificial** (Departamento de Engenharia Elétrica — DEE, Engenharia de Sistemas, Belo Horizonte; profs. João Pedro Campos e Cristiano Leite de Castro, segundo os slides). A tarefa é percorrer o ciclo completo de uma **rede bayesiana discreta**: escolher e tratar um conjunto tabular, desenhar à mão uma estrutura plausível, aprender a estrutura com **Hill-Climbing + BIC** e um segundo método dos slides, estimar as CPTs, responder perguntas por inferência e explicar uma predição. O conjunto escolhido é a **FAA National Wildlife Strike Database** (colisões de fauna com aeronaves nos EUA), recortada para 2017–2025 e reduzida a **72.877 colisões × 14 variáveis categóricas** (+ `nivel_dano` como variável extra). A entrega é um **notebook reproduzível** (instala as bibliotecas, baixa a base, roda o tratamento e todas as tarefas, com discussão após cada bloco) e um **relatório detalhado, de preferência em LaTeX**. O sucesso é medido pela clareza, correção gramatical e riqueza do relatório (critério declarado no enunciado).
+Trabalho prático 3 da disciplina **Fundamentos de Inteligência Artificial** (Departamento de Engenharia Elétrica — DEE, Engenharia de Sistemas, Belo Horizonte; profs. João Pedro Campos e Cristiano Leite de Castro, segundo os slides). A tarefa é percorrer o ciclo completo de uma **rede bayesiana discreta**: escolher e tratar um conjunto tabular, desenhar à mão uma estrutura plausível, aprender a estrutura com **Hill-Climbing + BIC** e um segundo método dos slides, estimar as CPTs, responder perguntas por inferência e explicar uma predição. O conjunto escolhido é a **FAA National Wildlife Strike Database** (colisões de fauna com aeronaves nos EUA), recortada para 2017–2025 e reduzida pelo script a **72.877 colisões**; o notebook remove as 65 sem quantidade atingida e funde `2_a_10`/`mais_de_10`, ficando **72.812 colisões × 14 variáveis categóricas** (+ `nivel_dano` como variável extra). A entrega é um **notebook reproduzível** (instala as bibliotecas, baixa a base, roda o tratamento e todas as tarefas, com discussão após cada bloco) e um **relatório detalhado, de preferência em LaTeX**. O sucesso é medido pela clareza, correção gramatical e riqueza do relatório (critério declarado no enunciado).
 
 ## 2. Stakeholders
 
@@ -22,7 +22,7 @@ Trabalho prático 3 da disciplina **Fundamentos de Inteligência Artificial** (D
 O ponto de partida já existe em `INPUTS/`:
 
 - **Script de coleta/limpeza** — `INPUTS/scripts/coletar_birdstrikes.py`: baixa `https://wildlife.faa.gov/assets/database_excel.zip` (~133 MB, contém `Public.xlsx`), lê a planilha (360.384 linhas × 102 colunas) com `python-calamine` (fallback `openpyxl`, ~10 min), guarda um cache `dados/brutos/strikes_bruto.parquet`, limpa e grava `dados/processados/strikes_rede.csv` + `relatorio.md`. Caminhos são relativos ao diretório corrente (`RAIZ = Path("dados")`), não a `INPUTS/`. Argumentos: `--sem-download`, `--ano-min 2017`, `--ano-max 2025` (2017 = critério de dano estável; 2026 incompleto).
-- **Funil de linhas** (de `relatorio.md`): 360.384 na planilha → 159.245 em 2017–2025 → −65.745 sem nível de dano → −20.623 sem fase do voo (carcaças achadas sem relato) → **72.877**.
+- **Funil de linhas** (de `relatorio.md`): 360.384 na planilha → 159.245 em 2017–2025 → −65.745 sem nível de dano → −20.623 sem fase do voo (carcaças achadas sem relato) → **72.877** (saída do script) → −65 sem quantidade atingida (no notebook) → **72.812**.
 - **Rede elicitada da Tarefa 2** — `INPUTS/rede_etapa2.png` (ver §4.2).
 - **Base tratada** — `INPUTS/dados/processados/strikes_rede.csv`. ⚠ O arquivo commitado está **alinhado com espaços** (nomes de colunas e valores, ex. `' estacao  '`, `' primavera'`): não é a saída crua de `to_csv`. Ler com `skipinitialspace=True` + `strip()`, ou regenerar pelo script. Sem NaN depois do strip.
 
@@ -124,17 +124,21 @@ Restrição: **PC**. Score: **Hill-Climbing com BIC**, Tabu Search, Simulated An
 | 2026-11-14 | Escopo: Build Order completa, **sem extras não pedidos** (sem PC/MMHC, `ExpertKnowledge`, EM, `SPEED`, alvo `nivel_dano`, variantes de HC) | "Se não foi pedido, não precisa fazer" | Bruno |
 | 2026-11-14 | Hill-Climbing puro (`tabu_length=0`); com tabu 100 o grafo é idêntico | Fiel ao algoritmo pedido | Agente |
 | 2026-11-14 | Parâmetros: BDeu α = 50 (melhor log-verossimilhança em holdout 80/20; MLE dá P = 0 em 16 registros de teste) | Tarefa 4 pede o "mais pertinente" | Agente |
-| 2026-11-14 | Bibliografia em **Vancouver** (natbib + `unsrtnat`), compila local e no Overleaf | TeX local não tem `biblatex`/`abntex2`; trocável | Agente (padrão, revisar) |
+| 2026-11-14 | ~~Bibliografia em Vancouver~~ → **ABNT** (NBR 6023 nas referências, autor-data NBR 10520 nas citações), `thebibliography` manual + natbib com rótulos ABNT | Pedido do Bruno; TeX local não tem `abntex2` | Bruno |
+| 2026-11-14 | Grupo: **Arthur Fernandes (2020026800), Bruno Lima Soares (2022055785), Eduarda Amaral** (matrícula pendente) | Capa e célula 0 | Bruno |
+| 2026-11-14 | Revisão aceita (supersede a linha "sem extras" quanto a `ExpertKnowledge`/variantes de HC): **HC + BIC por camadas** (`ExpertKnowledge(temporal_order=…)`, 6 camadas) como 4ª estrutura e rede das Tarefas 4–5; HC livre fica na Tarefa 3; **variante** com `required_edges=[ingestao_motor → efeito_voo]` só como comparação na Q2/Q3; **Q4 reformulada** para `do(tamanho_animal = pequeno)` (manejo de fauna); **2º caso na Tarefa 5** (falso negativo); `qtd_atingida` fundida em `um`/`dois_ou_mais` e 65 linhas sem quantidade removidas | Intervenções do HC livre eram artefatos da direção das setas (dano → ingestão) | Bruno |
+| 2026-11-14 | Desempate determinístico no HC (subclasse `HillClimbing` que ordena as operações candidatas) | O pgmpy itera um `set` cuja ordem depende do hash; empates de BIC (arestas reversíveis) davam redes livres diferentes por execução | Agente |
+| 2026-11-14 | Relatório em **2 colunas, 10 pt, ≤ 4 páginas**, prosa humanizada (skill humanize-text), tom de graduação | Pedido do Bruno | Bruno |
 
 ## 9. Open questions
 
 | # | Question | Who can answer | Blocking? |
 |---|---|---|---|
 | 1 | Qual o prazo de entrega e onde se submete (Moodle? PDF + .ipynb?) | Bruno / professores | Não (Bruno: seguir a Build Order completa independentemente do prazo) |
-| 2 | O TP é individual ou em grupo? Quem são os integrantes (capa do relatório)? | Bruno | Não |
+| 2 | ~~Integrantes~~ — **resolvido** (§8); falta só a matrícula da Eduarda Amaral (capa e célula 0) | Bruno | Não |
 | 3 | ~~Segundo método~~ — **resolvido: Chow-Liu** (§8) | Bruno | — |
 | 4 | ~~Ambiente-alvo~~ — **resolvido: os dois** (§8) | Bruno | — |
-| 5 | Relatório no Overleaf (sincronizado) ou LaTeX local? Formato de citação (ABNT/APA/Vancouver)? | Bruno | Não |
+| 5 | ~~Formato de citação~~ — **resolvido: ABNT** (§8). Overleaf ou local: não informado; compila localmente com `latexmk -pdf` | Bruno | Não |
 | 6 | ~~`SPEED`~~ — **resolvido: fica fora** (não pedido; a regra dos tercis vale para as contínuas usadas, só `HEIGHT`) | Bruno | — |
 | 7 | `estacao` está pela convenção do hemisfério norte (dez–fev = inverno), correta para os EUA — confirmar que é a intenção | Bruno | Não |
 
