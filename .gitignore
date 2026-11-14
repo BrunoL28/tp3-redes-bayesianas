@@ -63,3 +63,9 @@ logs/
 *.toc
 *.lof
 *.lot
+
+# --- Notebook run artifacts (created when the notebook runs inside notebook/) ---
+/notebook/dados/
+/notebook/coletar_birdstrikes.py
+/notebook/figuras/
+/notebook/tabelas/

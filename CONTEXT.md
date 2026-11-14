@@ -96,9 +96,9 @@ Restrição: **PC**. Score: **Hill-Climbing com BIC**, Tabu Search, Simulated An
 | pgmpy 1.1.2 | Estrutura, CPTs, inferência, intervenções | PyPI | `causal_discovery.HillClimbSearch`, `estimators.TreeSearch`, `causal_discovery.PC`, `estimators.MmhcEstimator`, `models.DiscreteBayesianNetwork`, `parameter_estimator.DiscreteMLE/DiscreteBayesianEstimator`, `inference.VariableElimination`, `inference.CausalInference`, `metrics.SHD` |
 | GitHub `BrunoL28/tp3-redes-bayesianas` | Estado do projeto | Privado | — |
 
-**Distribuições na base final (n = 72.877):** estacao outono 25.385 / verao 23.855 / primavera 16.681 / inverno 6.956 · fase_voo aproximacao 36.043 / corrida_pouso 13.722 / subida 10.671 / corrida_decolagem 8.663 / rota 3.463 / solo_taxi 315 · altura solo 22.731 / desconhecido 16.294 / media 11.430 / baixa 11.340 / alta 11.082 · massa pesada 53.546 / leve 11.090 / media 7.780 / desconhecido 461 · motor jato 61.124 / pistao 5.965 / helicoptero 2.616 / turboelice 2.613 / desconhecido 559 · animal ave 70.780 / morcego 1.194 / terrestre 903 · houve_dano sim 5.634 (7,7%) · ingestao_motor sim 2.240 · efeito_voo nenhum 68.011 / pouso_precaucao 3.470 / decolagem_abortada 828 / outro 467 / desligamento_motor 101.
+**Distribuições na base final (n = 72.877):** estacao outono 25.385 / verao 23.855 / primavera 16.681 / inverno 6.956 · fase_voo aproximacao 36.043 / corrida_pouso 13.722 / subida 10.671 / corrida_decolagem 8.663 / rota 3.463 / solo_taxi 315 · altura solo 22.731 / desconhecido 16.294 / media 11.430 / baixa 11.340 / alta 11.082 · massa pesada 53.546 / leve 11.090 / media 7.780 / desconhecido 461 · motor jato 61.124 / pistao 5.965 / helicoptero 2.616 / turboelice 2.613 / desconhecido 559 · animal ave 70.780 / morcego 1.194 / terrestre 903 · houve_dano sim 5.634 (7,7%) · ingestao_motor sim 2.240 · efeito_voo nenhum 68.011 / pouso_precaucao 3.470 / decolagem_abortada 818 / outro 467 / desligamento_motor 111 (pelo script atual; o CSV commitado em `INPUTS/` veio de uma versão anterior do script e tem 828/101 — 10 colisões "Aborted Take-off, Engine Shutdown" mudaram de grupo).
 
-**Sinais fortes já visíveis nas tabelas cruzadas** (`relatorio.md`, % com dano leve+grave): tamanho grande 44% vs. pequeno 2,9%; animal terrestre 30,8% vs. morcego 1,4%; motor pistão 23,2% vs. jato 5,6%; massa leve 19,9% vs. pesada 5,0%; ingestão no motor 25,1% vs. 7,1%; fase rota 18,8% vs. corrida_pouso 3,8%; efeito desligamento_motor 65,4% com dano. Estação, período e céu quase não mexem no dano (5–14%).
+**Sinais fortes já visíveis nas tabelas cruzadas** (`relatorio.md`, % com dano leve+grave): tamanho grande 44% vs. pequeno 2,9%; animal terrestre 30,8% vs. morcego 1,4%; motor pistão 23,2% vs. jato 5,6%; massa leve 19,9% vs. pesada 5,0%; ingestão no motor 25,1% vs. 7,1%; fase rota 18,8% vs. corrida_pouso 3,8%; efeito desligamento_motor 64,9% com dano. Estação, período e céu quase não mexem no dano (5–14%).
 
 ## 7. Constraints & non-negotiables
 
@@ -117,18 +117,25 @@ Restrição: **PC**. Score: **Hill-Climbing com BIC**, Tabu Search, Simulated An
 | ≤2026-11-13 | Remover linhas sem `DAMAGE_LEVEL` e sem `PHASE_OF_FLIGHT`; demais faltantes viram estado `desconhecido` | Alvo e fase são essenciais; perder outras linhas enviesaria a base | Bruno (script) |
 | ≤2026-11-14 | Rede elicitada com 14 nós (`INPUTS/rede_etapa2.png`) | Tarefa 2 | Bruno |
 | 2026-11-14 | Repo self-managed privado `BrunoL28/tp3-redes-bayesianas`; `INPUTS/dados/brutos/` fora do git | Zip de 133 MB excede o limite de 100 MB do GitHub; regenerável | Bruno + agente |
-| 2026-11-14 | pgmpy fixado em 1.1.2 | API mudou entre versões; reprodutibilidade | Agente (revisar) |
+| 2026-11-14 | pgmpy fixado em 1.1.2 | API mudou entre versões; reprodutibilidade | Agente |
+| 2026-11-14 | Segundo método da Tarefa 3: **Chow-Liu** | Seção inteira nos slides, `TreeSearch` no pgmpy, contraste claro com o HC | Bruno |
+| 2026-11-14 | Notebook roda no **Colab e em Jupyter local** | Reprodutibilidade nos dois ambientes | Bruno |
+| 2026-11-14 | Perguntas de interesse **Q1–Q4** do plano (§9 C4) aprovadas | — | Bruno |
+| 2026-11-14 | Escopo: Build Order completa, **sem extras não pedidos** (sem PC/MMHC, `ExpertKnowledge`, EM, `SPEED`, alvo `nivel_dano`, variantes de HC) | "Se não foi pedido, não precisa fazer" | Bruno |
+| 2026-11-14 | Hill-Climbing puro (`tabu_length=0`); com tabu 100 o grafo é idêntico | Fiel ao algoritmo pedido | Agente |
+| 2026-11-14 | Parâmetros: BDeu α = 50 (melhor log-verossimilhança em holdout 80/20; MLE dá P = 0 em 16 registros de teste) | Tarefa 4 pede o "mais pertinente" | Agente |
+| 2026-11-14 | Bibliografia em **Vancouver** (natbib + `unsrtnat`), compila local e no Overleaf | TeX local não tem `biblatex`/`abntex2`; trocável | Agente (padrão, revisar) |
 
 ## 9. Open questions
 
 | # | Question | Who can answer | Blocking? |
 |---|---|---|---|
-| 1 | Qual o prazo de entrega e onde se submete (Moodle? PDF + .ipynb?) | Bruno / professores | Sim, para o cronograma |
+| 1 | Qual o prazo de entrega e onde se submete (Moodle? PDF + .ipynb?) | Bruno / professores | Não (Bruno: seguir a Build Order completa independentemente do prazo) |
 | 2 | O TP é individual ou em grupo? Quem são os integrantes (capa do relatório)? | Bruno | Não |
-| 3 | Segundo método de aprendizado: Chow-Liu (recomendado no plano), PC ou MMHC? | Bruno | Sim, para a Tarefa 3 |
-| 4 | Ambiente-alvo do notebook: Google Colab ou Jupyter local? | Bruno | Sim, para C1 |
+| 3 | ~~Segundo método~~ — **resolvido: Chow-Liu** (§8) | Bruno | — |
+| 4 | ~~Ambiente-alvo~~ — **resolvido: os dois** (§8) | Bruno | — |
 | 5 | Relatório no Overleaf (sincronizado) ou LaTeX local? Formato de citação (ABNT/APA/Vancouver)? | Bruno | Não |
-| 6 | Manter `SPEED` fora da rede ou adicionar `velocidade` em tercis (reforça o requisito de "contínuas em três faixas por quantis")? | Bruno | Não |
+| 6 | ~~`SPEED`~~ — **resolvido: fica fora** (não pedido; a regra dos tercis vale para as contínuas usadas, só `HEIGHT`) | Bruno | — |
 | 7 | `estacao` está pela convenção do hemisfério norte (dez–fev = inverno), correta para os EUA — confirmar que é a intenção | Bruno | Não |
 
 ## 10. Sources

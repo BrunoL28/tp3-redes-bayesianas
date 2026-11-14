@@ -10,30 +10,35 @@
 
 ## 1. Current Implementation Status
 
-**Phase:** Phase 0 — bootstrap concluído; aguardando revisão do plano e respostas às perguntas abertas (CONTEXT §9).
+**Phase:** Phase 1 — build. Notebook completo (Tarefas 1–5) executado e validado localmente; faltam o teste limpo (T12, com download real e pandas 2), o relatório LaTeX (C12) e a entrega (C13).
 
 | # | Component | Status | Tested? | Notes |
 |---|---|---|---|---|
-| C0 | Ambiente local (`.venv` + pgmpy 1.1.2) | ⬜ Not started | — | `tmp/venv` existe só para a auditoria; o venv do projeto é `.venv/` |
-| C1 | Notebook — setup do ambiente | ⬜ Not started | — | Depende da resposta "Colab ou local" (CONTEXT §9 #4) |
-| C2 | Notebook — coleta e tratamento (script da FAA) | 🟡 Script pronto em `INPUTS/scripts/` | Gerou `INPUTS/dados/processados/*` em 2026-11-13 (72.877 linhas) | Falta embutir no notebook |
-| C3 | Carga e validação da base | ⬜ Not started | — | CSV commitado é alinhado com espaços |
-| C4 | Tarefa 1 — domínio, pré-processamento, perguntas | 🟡 Pré-processamento feito | `relatorio.md` | Perguntas de interesse ainda não fixadas (proposta em §9-C4) |
-| C5 | Tarefa 2 — rede elicitada | ✅ Desenho feito | — | `INPUTS/rede_etapa2.png`; falta codificar como DAG (17 arestas) |
-| C6 | Tarefa 3a — Hill-Climbing + BIC | ⬜ Not started | — | |
-| C7 | Tarefa 3b — segundo método (Chow-Liu, proposto) | ⬜ Not started | — | Decisão pendente (CONTEXT §9 #3) |
-| C8 | Tarefa 3c — comparação das estruturas | ⬜ Not started | — | |
-| C9 | Tarefa 4 — CPTs + inferência | ⬜ Not started | — | |
-| C10 | Tarefa 5 — explicação de uma predição | ⬜ Not started | — | |
-| C11 | Figuras e tabelas exportadas | ⬜ Not started | — | `relatorio/figuras/` |
-| C12 | Relatório LaTeX | ⬜ Not started | — | `relatorio/` |
-| C13 | Entrega (snapshot + execução limpa) | ⬜ Not started | — | `entregas/` |
+| C0 | Ambiente local (`.venv` + pgmpy 1.1.2) | ✅ Done | Smoke test de todas as chamadas da §7.2 (2026-11-14) | pandas 3.1.1, numpy 2.5.4, networkx 3.7 |
+| C1 | Notebook — setup do ambiente | ✅ Done | Execução completa local | `notebook/tp3_redes_bayesianas.ipynb` (52 células, salvo com saídas) |
+| C2 | Notebook — coleta e tratamento | ✅ Done | Script via `%%writefile` + `subprocess` com o Python do kernel; saída idêntica ao script de `INPUTS/` | Leitura do xlsx: pico 4,5 GB (pandas 3) / 5,3 GB (pandas 2) no subprocesso |
+| C3 | Carga e validação da base | ✅ Done | 72.877 × 14, 0 NaN, estados conferidos, crosstab dano × nível ok | |
+| C4 | Tarefa 1 | ✅ Done | Tabelas de variáveis, tercis (asserção bate com o CSV), funil, figura de taxa de dano | Tercis de altura: (1, 350], (350, 1700], (1700, 32000] pés |
+| C5 | Tarefa 2 | ✅ Done | 17 arestas, acíclico; figura no layout do desenho original | |
+| C6 | Tarefa 3a — HC + BIC | ✅ Done | 29 arestas, 1.182 parâmetros, BIC −701.077; determinístico em 6 `PYTHONHASHSEED` | `tabu_length=0`; com 100 o grafo é idêntico |
+| C7 | Tarefa 3b — Chow-Liu | ✅ Done | 13 arestas; BIC idêntico nas 14 raízes; raiz `massa_aeronave` | Calculado uma vez (10 s) e reorientado por `nx.bfs_tree`, igual ao pgmpy |
+| C8 | Tarefa 3c — comparação | ✅ Done | Tabelas de arestas, SHD entre CPDAGs (função própria), coocorrência de `desconhecido` | Árvore de Chow-Liu ⊂ esqueleto do HC (verificado) |
+| C9 | Tarefa 4 | ✅ Done | BDeu α = 50 escolhido em holdout; Q1–Q4 com checagem empírica; Q4 confere com `CausalInference` | Q2/Q3 divergem dos dados — explicado (aresta `ingestao_motor → efeito_voo` descartada pelo BIC: ΔLL +154, ΔBIC −920) |
+| C10 | Tarefa 5 | ✅ Done | Caso FAA 1515245: 90,9%; P(blanket) = P(evidência completa) até 1e-9 | Intervenções por cirurgia do grafo (`modelo.do`) |
+| C11 | Figuras e tabelas | ✅ Done | 8 figuras (PDF+PNG) em `relatorio/figuras/`, 18 tabelas `.tex` (pt-BR) + explicação em `relatorio/tabelas/` | |
+| C12 | Relatório LaTeX | ⬜ Not started | — | Vancouver via natbib/`unsrtnat` (padrão; CONTEXT §9 #5) |
+| C13 | Entrega | ⬜ Not started | — | Depende de T12 e C12 |
 
 ### Bug log
 
 | Date | Bug | Root cause | Fix | Status |
 |---|---|---|---|---|
-| 2026-11-14 | `pd.read_csv("strikes_rede.csv")` devolve colunas `' estacao  '` e valores `' primavera'` | CSV commitado foi alinhado com espaços (não é a saída crua de `to_csv`) | Ler com `skipinitialspace=True` + `strip()` (C3) ou regenerar pelo script (C2) | Open (contornado no plano) |
+| 2026-11-14 | `pd.read_csv("strikes_rede.csv")` devolve colunas `' estacao  '` e valores `' primavera'` | CSV commitado foi alinhado com espaços (não é a saída crua de `to_csv`) | C3 lê de forma robusta; o notebook regenera o CSV pelo script | Fixed |
+| 2026-11-14 | CSV commitado difere do script atual em 10 linhas de `efeito_voo` | CSV gerado por versão anterior do script (ordem das regras de `EFEITO`) | Script atual é a fonte; números corrigidos no CONTEXT (818/111) | Fixed |
+| 2026-11-14 | `SHD()` com PDAG: `ValueError` (só aceita DAG) | Limitação do pgmpy 1.1.2 | `shd_cpdag` própria no notebook | Fixed |
+| 2026-11-14 | Estados das CPTs em ordem alfabética | O estimador ignora a ordem das categorias | `state_names=STATE_NAMES` no estimador | Fixed |
+| 2026-11-14 | `CausalInference.query(do=ingestao_motor)` → `ValueError` (alvo é ancestral da variável intervinda) | Comportamento correto do pgmpy | Intervenção por cirurgia: `modelo.do([X])` + `VariableElimination` | Fixed |
+| 2026-11-14 | WSL derrubado por falta de memória (12 GB) | Duas execuções do notebook em paralelo: leitura do xlsx (5,3 GB, pandas 2) + kernel com 4,9 GB (`TreeSearch` `n_jobs=-1` ×14 = +1,7 GB; parquet inteiro = +0,7 GB) | `TreeSearch(n_jobs=1)` uma vez só; parquet só com 4 colunas; kernel agora ≤ 0,44 GB; execuções pesadas uma por vez e com `systemd-run -p MemoryMax` | Fixed |
 
 ---
 
@@ -56,11 +61,9 @@ O TP3 pede o ciclo completo de uma rede bayesiana sobre um conjunto como esse: m
 - Explicabilidade: uma predição concreta explicada por Markov blanket, sensibilidade (leave-one-out + variação de estados), caminhos ativos, intervenção `do()` e texto em linguagem natural gerado por template.
 - Notebook único executável do início ao fim + relatório LaTeX.
 
-**Explicitly deferred (Phase 2+):**
-- Terceiro método (PC ou MMHC) como comparação extra — só se sobrar tempo; enriquece a discussão de score vs. restrição vs. híbrido.
-- HC + BIC com conhecimento a priori (`ExpertKnowledge`, ex. proibir arestas que entram em `estacao`/`periodo`) — variante interessante, não pedida.
-- `nivel_dano` (3 estados) como alvo alternativo — só 420 casos graves; fica para discussão.
-- `velocidade` (`SPEED` em tercis) como 15º nó — ver Known Holes #6.
+**Explicitly not done (decisão do Bruno, 2026-11-14: "se não foi pedido, não precisa fazer"):**
+- Terceiro método (PC/MMHC), HC com `ExpertKnowledge`, variante HC com tabu, MAP query.
+- `nivel_dano` como alvo alternativo; `SPEED` como 15º nó; tratamento de `desconhecido` por EM.
 
 **Acceptable v1 fallbacks:**
 - Se o download da FAA falhar no momento da execução, o notebook aceita um `Public.xlsx`/zip local enviado manualmente (célula alternativa documentada), mantendo o mesmo tratamento.
@@ -528,16 +531,18 @@ Só se o relatório for escrito/compilado no Overleaf. Ler `.agents/skills/overl
 
 | # | Item | Status | Action |
 |---|---|---|---|
-| 1 | Prazo de entrega e forma de submissão desconhecidos | Blocker | Bruno informa (CONTEXT §9 #1) |
-| 2 | Estados `desconhecido` (até 51% em `avisado`) podem gerar arestas espúrias entre variáveis que só compartilham a fonte do relato | Open | Quantificar em C8 com crosstab dos `desconhecido`; discutir. Definitiva (Phase 2): tratar como faltante e estimar com EM (`DiscreteEM`) ou modelar um nó "fonte do relato" |
-| 3 | Segundo método não decidido (Chow-Liu recomendado; PC/MMHC alternativas) | Blocker | Bruno decide (CONTEXT §9 #3) |
+| 1 | Prazo de entrega e forma de submissão desconhecidos | Open | Não bloqueia: seguir a Build Order completa (Bruno) |
+| 2 | Estados `desconhecido` geram arestas espúrias (confirmado: coocorrência 1,3–3,5× na maioria dos pares; 8 das 18 arestas só-HC ligam variáveis de contexto/relato) | Accepted | Discutido na Tarefa 3 e nas limitações; tratamento por EM fora do escopo (não pedido) |
+| 3 | Segundo método | Resolved | Chow-Liu (Bruno, 2026-11-14) |
 | 4 | A FAA atualiza o zip; reexecutar pode mudar contagens (72.877 hoje) | Low risk | Notebook imprime contagens e data (`Last-Modified`); relatório cita a data do download; C3 avisa em vez de falhar se n ≠ 72.877 |
 | 5 | CSV commitado alinhado com espaços | Low risk | C3 lê de forma robusta; notebook usa o CSV regenerado pelo script |
-| 6 | `SPEED` é lida pelo script mas não vira nó; só `HEIGHT` é contínua discretizada | Open | Decidir com Bruno (CONTEXT §9 #6). Incluir `velocidade` em tercis reforça o requisito "contínuas em três faixas por quantis" e provavelmente se liga a `fase_voo`/`altura` |
+| 6 | `SPEED` é lida pelo script mas não vira nó | Resolved | Fica fora (Bruno: não pedido) |
 | 7 | `M?` (dano indeterminado) codificado como `leve`; `EFFECT` vazio vira `nenhum` | Open | Justificar no relatório (C4); sensibilidade opcional removendo `M?` |
 | 8 | Viés de seleção: removidas 65.745 linhas sem dano informado e 20.623 sem fase | Open | Discutir em Limitações; mostrar taxa de dano por ano estável (0,4–0,8% grave) |
 | 9 | `nivel_dano` determinístico em relação a `houve_dano` | Low risk | Fora do aprendizado; C3 confirma por crosstab |
-| 10 | Assinaturas pgmpy 1.1.2 não executadas (SHD com PDAG, `state_names` no estimador, log-prob) | Open | Smoke test (Build Order 1) |
+| 10 | Assinaturas pgmpy 1.1.2 | Resolved | Smoke test feito; desvios no bug log |
+| 14 | Q2 e Q3: a rede diverge dos dados (sem aresta `ingestao_motor → efeito_voo`) | Accepted | É resultado: discutido na Tarefa 4 com o cálculo do BIC da aresta |
+| 15 | Teste limpo T12 (venv novo, pandas 2, download real) ainda não concluído — a primeira tentativa morreu com o WSL | Open | Rodar sozinho, com `systemd-run -p MemoryMax=9G` |
 | 11 | Repo privado: notebook não pode buscar nada do GitHub | Low risk | Script embutido via `%%writefile` (C2) |
 | 12 | Leitura causal das intervenções (`do()`) depende de assumir o DAG aprendido como causal | Open | Ressalva explícita em C9/C10 e no relatório |
 | 13 | TP individual ou em grupo; formato de citação; Overleaf ou local | Open | Bruno (CONTEXT §9 #2, #5) |
@@ -565,18 +570,18 @@ Só se o relatório for escrito/compilado no Overleaf. Ler `.agents/skills/overl
 
 | Test | Input | Expected output | Result |
 |---|---|---|---|
-| T1 Versões | célula C1 | `pgmpy 1.1.2` impresso; assert passa | ⬜ |
-| T2 Coleta | `!python coletar_birdstrikes.py` | `strikes_rede.csv` com 17 colunas, sem padding; `relatorio.md` gerado | ⬜ |
-| T3 Carga | `carregar_base` | 72.877 linhas (ou diferença registrada), 0 NaN, nenhum estado fora de `STATE_NAMES` | ⬜ |
-| T4 Determinismo do alvo | `crosstab(houve_dano, nivel_dano)` | só diagonais nao/nenhum e sim/{leve, grave} | ⬜ |
-| T5 Elicitada | `dag_elic` | 14 nós, 17 arestas, acíclico | ⬜ |
-| T6 HC | `dag_hc` | DAG (não PDAG), acíclico, 14 nós; BIC ≥ BIC(elicitada) | ⬜ |
-| T7 Chow-Liu | `dag_cl` | árvore: 13 arestas, cada nó ≤ 1 pai, conexo | ⬜ |
-| T8 Modelo | `modelo.check_model()` | True; todas as CPDs somam 1 por coluna | ⬜ |
-| T9 Consultas | Q1–Q4 | cada fator soma 1; com suporte ≥ 500 linhas, |rede − empírico| < 2 p.p. (senão, explicar) | ⬜ |
-| T10 Markov blanket | caso da Tarefa 5 | P(alvo | evidência completa) = P(alvo | só blanket) ± 1e-9 | ⬜ |
-| T11 Reprodutibilidade | duas execuções completas | mesmas estruturas, mesmos números | ⬜ |
-| T12 Execução limpa | venv novo / Colab, *Run all* | termina sem erro; tempo registrado | ⬜ |
+| T1 Versões | célula C1 | `pgmpy 1.1.2` impresso; assert passa | ✅ |
+| T2 Coleta | `!python coletar_birdstrikes.py` | `strikes_rede.csv` com 17 colunas, sem padding; `relatorio.md` gerado | ✅ |
+| T3 Carga | `carregar_base` | 72.877 linhas (ou diferença registrada), 0 NaN, nenhum estado fora de `STATE_NAMES` | ✅ |
+| T4 Determinismo do alvo | `crosstab(houve_dano, nivel_dano)` | só diagonais nao/nenhum e sim/{leve, grave} | ✅ |
+| T5 Elicitada | `dag_elic` | 14 nós, 17 arestas, acíclico | ✅ |
+| T6 HC | `dag_hc` | DAG (não PDAG), acíclico, 14 nós; BIC ≥ BIC(elicitada) | ✅ (BIC −701.077 > −739.940) |
+| T7 Chow-Liu | `dag_cl` | árvore: 13 arestas, cada nó ≤ 1 pai, conexo | ✅ |
+| T8 Modelo | `modelo.check_model()` | True; todas as CPDs somam 1 por coluna | ✅ |
+| T9 Consultas | Q1–Q4 | cada fator soma 1; com suporte ≥ 500 linhas, |rede − empírico| < 2 p.p. (senão, explicar) | ✅ Q1 ok; Q2/Q3 divergem com suporte grande — explicado (Known Holes #14) |
+| T10 Markov blanket | caso da Tarefa 5 | P(alvo | evidência completa) = P(alvo | só blanket) ± 1e-9 | ✅ (igual a 1e-10) |
+| T11 Reprodutibilidade | duas execuções completas | mesmas estruturas, mesmos números | ✅ (2 execuções idênticas; HC igual em 6 sementes de hash) |
+| T12 Execução limpa | venv novo / Colab, *Run all* | termina sem erro; tempo registrado | ⬜ (1ª tentativa perdida na queda do WSL) |
 | T13 Relatório | `latexmk -pdf main.tex` | compila sem `??` (refs quebradas); toda figura/tabela citada | ⬜ |
 
 ### B. AI test prompts
